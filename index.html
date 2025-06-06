@@ -469,15 +469,16 @@ document.addEventListener('DOMContentLoaded', function() {
         body: formData
       })
       .then(response => {
-        if (response.ok) {
-          // Mostrar mensaje de éxito
-          document.getElementById('sendmessage').style.display = 'block';
-          form.reset();
-          clearAllErrors();
-        } else {
-          throw new Error('Error al enviar el formulario');
-        }
-      })
+  if (response.ok) {
+    // Mostrar mensaje de éxito y luego recargar
+    document.getElementById('sendmessage').style.display = 'block';
+    setTimeout(() => {
+      location.reload(); // recarga la página después de 2 segundos
+    }, 2000);
+  } else {
+    throw new Error('Error al enviar el formulario');
+  }
+})
       .catch(error => {
         console.error('Error:', error);
         document.getElementById('errormessage').innerHTML = 'Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.';
