@@ -319,7 +319,7 @@
               <div id="errormessage" style="display: none;"></div>
               
               <!-- Formulario mejorado con FormSubmit -->
-              <form action="https://formsubmit.co/gealsipon@outlook.com" method="POST" class="contactForm" id="contactForm">
+              <form method="POST" class="contactForm" id="contactForm">
                 <!-- Configuración de FormSubmit -->
                 <input type="hidden" name="_subject" value="Nuevo mensaje desde el sitio web de Gealsipon">
                 <input type="hidden" name="_template" value="table">
@@ -439,61 +439,69 @@ document.addEventListener('DOMContentLoaded', function() {
     validateMessage();
   });
   
-  // Validación al enviar el formulario
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Ocultar mensajes previos
-    document.getElementById('sendmessage').style.display = 'none';
-    document.getElementById('errormessage').style.display = 'none';
-    
-    let isValid = true;
-    
-    // Validar todos los campos
-    if (!validateName()) isValid = false;
-    if (!validateEmail()) isValid = false;
-    if (!validateSubject()) isValid = false;
-    if (!validateMessage()) isValid = false;
-    
-    if (isValid) {
-      // Deshabilitar el botón y mostrar estado de carga
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = 'Enviando...';
-      
-      // Crear FormData para envío
-      const formData = new FormData(form);
-      
-      // Enviar usando fetch
-      fetch(form.action, {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => {
-  if (response.ok) {
-    // Mostrar mensaje de éxito y luego recargar
-    document.getElementById('sendmessage').style.display = 'block';
-    setTimeout(() => {
-      location.reload(); // recarga la página después de 2 segundos
-    }, 4000);
-  } else {
-    throw new Error('Error al enviar el formulario');
-  }
-})
-      .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('errormessage').innerHTML = 'Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.';
-        document.getElementById('errormessage').style.display = 'block';
-      })
-      .finally(() => {
-        // Rehabilitar el botón
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Enviar mensaje';
-      });
-    } else {
-      document.getElementById('errormessage').innerHTML = 'Por favor, corrige los errores en el formulario antes de enviarlo.';
+// Validación al enviar el formulario
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  // Ocultar mensajes previos
+  document.getElementById('sendmessage').style.display = 'none';
+  document.getElementById('errormessage').style.display = 'none';
+
+  let isValid = true;
+
+  if (!validateName()) isValid = false;
+  if (!validateEmail()) isValid = false;
+  if (!validateSubject()) isValid = false;
+  if (!validateMessage()) isValid = false;
+
+  if (isValid) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Enviando...';
+
+    const formData = {
+      name: nameInput.value.trim(),
+      email: emailInput.value.trim(),
+      subject: subjectInput.value.trim(),
+      message: messageInput.value.trim(),
+      _subject: "Nuevo mensaje desde el sitio web de Gealsipon",
+      _template: "table",
+      _captcha: "false",
+      _autoresponse: "Gracias por contactar con Gealsipon. Hemos recibido tu mensaje y te responderemos pronto."
+    };
+
+    fetch("https://formsubmit.co/ajax/gealsipon@outlook.com", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => {
+      if (response.ok) {
+        document.getElementById('sendmessage').style.display = 'block';
+        form.reset(); // limpia los campos
+        setTimeout(() => {
+          location.reload();
+        }, 4000);
+      } else {
+        throw new Error('Error al enviar el formulario');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      document.getElementById('errormessage').innerHTML = 'Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.';
       document.getElementById('errormessage').style.display = 'block';
-    }
-  });
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Enviar mensaje';
+    });
+  } else {
+    document.getElementById('errormessage').innerHTML = 'Por favor, corrige los errores en el formulario antes de enviarlo.';
+    document.getElementById('errormessage').style.display = 'block';
+  }
+});
   
   // Funciones de validación
   function validateName() {
